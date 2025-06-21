@@ -320,7 +320,7 @@ class Arbol:
         bytes_lista = [binario_total[i:i + 8] for i in range(0, len(binario_total), 8)]
         raiz.animaciones = animaciones_globales
         raiz.decodificado = letras_decodificadas
-        return (padding, bytes_lista)
+        return (padding, bytes_lista, binario_total)
 
     @staticmethod
     def crear_archivo_bin(nombre_archivo, frecuencia, codigo):
@@ -331,7 +331,7 @@ class Arbol:
             frecuencia (list): list containing the letters and their repetitions
             codigo (str): encrypted text
         """
-        padding, codigos_binarios = codigo
+        padding, codigos_binarios = codigo[:-1]
         contenido = bytearray()
         contenido.append((padding >> 8) & 0xFF)
         contenido.append(padding & 0xFF)
@@ -343,6 +343,7 @@ class Arbol:
             contenido.append(int(byte_str, 2))
         with open(nombre_archivo, 'wb') as f:
             f.write(contenido)
+        
 
     @staticmethod
     def decodificar(codigo, raiz):
@@ -390,6 +391,7 @@ class Arbol:
         raiz = Arbol.estructura_huffman(frecuencia)
         codigo = Arbol.guardar_en_binario(texto, raiz)
         Arbol.crear_archivo_bin(archivo_salida, frecuencia, codigo)
+        return codigo[2]
 
     @staticmethod
     def bin_to_text(lista, codificacion):
@@ -417,5 +419,5 @@ if __name__ == "__main__":
     texto = 'hola alas'
     frecuencia = Arbol.text_to_bin(texto, 'Prueba2')
     print(f'Frecuencia codificar: {frecuencia}')
-    lista = [('a', 3), ('l', 2), ('h', 1), ('s', 1), ('o', 1), (' ', 1) ]
-    print(Arbol.bin_to_text(lista, '111111111010011001001110'))
+    #lista = [('a', 3), ('l', 2), ('h', 1), ('s', 1), ('o', 1), (' ', 1) ]
+    #print(Arbol.bin_to_text(lista, '111111111010011001001110'))
