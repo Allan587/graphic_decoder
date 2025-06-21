@@ -11,6 +11,11 @@ class Arbol:
         self.hijo_derecha: Arbol = None
 
     def insertar(self, elemento):
+        """Functions that insert elements into the tree structure
+
+        Args:
+            elemento (int): take the number of repetitions of the letters
+        """
         valor = elemento[1]
         if valor >= self.valor[1]:
             if self.hijo_izquierda is None:
@@ -25,6 +30,11 @@ class Arbol:
 
     @property
     def altura(self):
+        """function that determinate the high of the tree
+
+        Returns:
+            int: returns an integer with the number of levels
+        """
         if self.hoja:
             return 1
         altura_hijo_iz = self.hijo_izquierda.altura if self.hijo_izquierda else 0
@@ -33,9 +43,23 @@ class Arbol:
 
     @property
     def hoja(self):
+        """Function to check if a node is a leaf
+
+        Returns:
+            bool: returns true or false
+        """
         return self.hijo_derecha is None and self.hijo_izquierda is None
 
     def imprimir_nodo(self, raiz, valor, x, y, color=(0, 0, 255)):
+        """Function that displays the nodes of the tree
+
+        Args:
+            raiz (object): take tree strcuture
+            valor (tuple): tuple with the letter and number of repetitions 
+            x (int):  coordinates for x
+            y (int): coordinates for y 
+            color (tuple, optional): _description_. Defaults to (0, 0, 255).
+        """
         pygame.draw.circle(raiz.VENTANA, color, (x, y), 20)
         texto = f"{valor[0]} = {valor[1]}" if isinstance(valor[0], str) and len(valor[0]) == 1 else f"{valor[1]}"
         texto_render = raiz.fuente.render(texto, True, (255, 255, 255))
@@ -43,6 +67,19 @@ class Arbol:
         raiz.VENTANA.blit(texto_render, texto_rect)
 
     def mostrar_nodos_adaptativo(self, raiz, x, y, nivel, espacio, camara, animaciones=None, letra_actual=None, decodificado=""):
+        """function that displays the nodes of a binary tree with support for simple animations.
+
+        Args:
+            raiz (object): Reference to the root object of the tree, used to access the drawing window.
+            x (int): Horizontal coordinate of the current node.
+            y (int): Vertical coordinate of the current node.
+            nivel (int): Current level of the node in the tree, starting at 0.
+            espacio (int): Horizontal spacing between nodes at the same level.
+            camara (class): Object used to apply zoom or screen transformations.
+            animaciones (list, optional): List of (node, is_correct) tuples for animation steps.
+            letra_actual (_type_, optional): Currently processed character (optional, for visualization).
+            decodificado (str, optional): Decoded string so far (optional display).
+        """
         x_tr, y_tr = camara.aplicar_transformacion(x, y)
         color = (0, 0, 255)
         if animaciones:
@@ -66,6 +103,12 @@ class Arbol:
         
     @staticmethod
     def obtener_animacion_para_letra(nodo, letra):
+        """Function that generate an animation when a letter is found on the tree
+
+        Args:
+            nodo (tuple): tuple that constains letters and their repetititions
+            letra (str): letter to be found
+        """
         def buscar_codigo(nodo, letra, camino=None, anim=None):
             if camino is None: camino = ""
             if anim is None: anim = []
@@ -85,6 +128,7 @@ class Arbol:
         return buscar_codigo(nodo, letra)
 
     def mostrar_arbol_grafico(self):
+        """Function that displays a tree with a small animation in green and continuously filled with the ciphertext letter by letter."""
         ancho = 1000; alto = 600
         self.VENTANA = pygame.display.set_mode((ancho, alto))
         pygame.display.set_caption("Despliegue de árbol")
@@ -137,6 +181,10 @@ class Arbol:
 
     @staticmethod
     def estructura_huffman(frecuencias):
+        """Generate a tree in the form of a Huffman structure
+        
+        Args: frecuencias(list): a list that constains letters and their repetititions
+        """
         nodos = [Arbol((letra, freq, codigo)) for letra, freq, codigo in frecuencias]
         nodos.sort(key=lambda nodo: nodo.valor[1])
         lista = []
@@ -158,6 +206,14 @@ class Arbol:
     @staticmethod
     def codificador_grafico(texto):
         def tipo_prioridad(char):
+            """Function that organize the list by a priority determined
+
+            Args:
+                char (str): letter or character 
+
+            Returns:
+                list: organized list by the priority determinated
+            """
             if char.isalpha():
                 if char in 'ÁÉÍÓÚÜ': return (0, ord(char))
                 if char.isupper(): return (1, ord(char))
@@ -176,7 +232,20 @@ class Arbol:
     
     @staticmethod
     def codificador_grafico_bin(lista_frecuencias):
+        """Function that encode a text
+
+        Args:
+            lista_frecuencias (list): list with the letters and their repetitions
+        """
         def tipo_prioridad(char):
+            """Function that organize the list by a priority determined
+
+            Args:
+                char (str): letter or character 
+
+            Returns:
+                list: organized list by the priority determinated
+            """
             if char.isalpha():
                 if char in 'ÁÉÍÓÚÜ': return (0, ord(char))
                 if char.isupper(): return (1, ord(char))
@@ -194,6 +263,15 @@ class Arbol:
 
     @staticmethod
     def buscar_letra(nodo, codigo):
+        """Function that searches for a letter in the tree structure
+
+        Args:
+            nodo (tuple): contains the letters and their associated code.
+            codigo (str): ciphertext
+
+        Returns:
+            str: searched letter
+        """
         if nodo is None:
             return None
         if len(codigo) == 0:
@@ -204,6 +282,12 @@ class Arbol:
     
     @staticmethod
     def guardar_en_binario(texto_encryp, raiz):
+        """Function that converts the ciphertext and its tree structure into binary values
+
+        Args:
+            texto_encryp (str): ciphertext
+            raiz (object): tree structure
+        """
         def buscar_codigo(nodo, letra, camino=None, anim=None):
             if camino is None: camino = ""
             if anim is None: anim = []
@@ -240,6 +324,13 @@ class Arbol:
 
     @staticmethod
     def crear_archivo_bin(nombre_archivo, frecuencia, codigo):
+        """Function that generate a file that contains the word or text, encrypted
+
+        Args:
+            nombre_archivo (str): name of the file
+            frecuencia (list): list containing the letters and their repetitions
+            codigo (str): encrypted text
+        """
         padding, codigos_binarios = codigo
         contenido = bytearray()
         contenido.append((padding >> 8) & 0xFF)
@@ -255,6 +346,15 @@ class Arbol:
 
     @staticmethod
     def decodificar(codigo, raiz):
+        """Function that decode a word or text
+
+        Args:
+            codigo (str): word or text encrypted
+            raiz (object): tree structure 
+
+        Returns:
+            str: decode word or text
+        """
         decodificacion, acumulador = "", ""
         animaciones_globales = []
         for bit in codigo:
@@ -275,16 +375,36 @@ class Arbol:
 
     @staticmethod
     def text_to_bin(texto, archivo_salida="salida.bin"):
+        """Functions that encrypt a word, text, etc.
+
+        Args:
+            texto (str): word or text that will be encrypt
+            archivo_salida (str, optional name for the file): Generate a file containing a word or ciphertext in binary format
+
+        Raises:
+            ValueError: an input where the word or text it's empty 
+        """
         if not texto:
             raise ValueError("El texto de entrada no puede estar vacío.")
         frecuencia = Arbol.codificador_grafico(texto)
         raiz = Arbol.estructura_huffman(frecuencia)
         codigo = Arbol.guardar_en_binario(texto, raiz)
         Arbol.crear_archivo_bin(archivo_salida, frecuencia, codigo)
-        return frecuencia
 
     @staticmethod
     def bin_to_text(lista, codificacion):
+        """Function that decode a word, text, etc.
+
+        Args:
+            lista (list): list of the letters and it's repetitions
+            codificacion (str): codification of the word, text, etc.
+
+        Raises:
+            ValueError: an input where the list it's empty
+
+        Returns:
+            str: decode word, text, paragraph, etc.
+        """
         if not lista:
             raise ValueError("La lista de entrada no puede estar vacía.")
         frecuencia = Arbol.codificador_grafico_bin(lista)
